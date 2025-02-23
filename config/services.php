@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'dialogflow' => [
+        'webhook_secret' => env('DIALOGFLOW_WEBHOOK_SECRET'),
+    ],
+
 ];

@@ -3,60 +3,56 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Models\Product;
+use Illuminate\Support\Facades\Log;
 
 class DialogflowController extends Controller
 {
-    public function status(): JsonResponse
+    public function handleWebhook(Request $request): JsonResponse
     {
+        Log::info('Dialogflow Request:', $request->all());
+
+        $intent = $request->input('queryResult.intent.displayName');
+        $parameters = $request->input('queryResult.parameters', []);
+
+        // Fix: Use 'category' instead of 'productavailability'
+        $categoryName = $parameters['category'] ?? '';
+
+        if ($intent === 'product.availability') {
+            return $this->handleProductAvailability($categoryName);
+        }
+
         return response()->json([
-            'status' => 'ok',
-            'message' => 'Dialogflow webhook endpoint is working'
+            'fulfillmentText' => "I'm not sure how to help with that."
         ]);
     }
 
-    public function handleWebhook(Request $request): JsonResponse
+    private function handleProductAvailability(string $categoryName): JsonResponse
     {
-        $body = $request->json()->all();
-        $intent = $body['queryResult']['intent']['displayName'] ?? null;
-        $parameters = $body['queryResult']['parameters'] ?? [];
-
-        switch ($intent) {
-            case 'get_product_count':
-                return $this->handleGetProductCount($parameters);
-            case 'get_products_by_category':
-                return $this->handleGetProductCount($parameters);
-            default:
-                return response()->json([
-                    'fulfillmentText' => 'Sorry, I don\'t understand that request.'
-                ]);
-        }
-    }
-
-    private function handleGetProductCount(array $parameters): JsonResponse
-    {
-        $categoryName = $parameters['category'] ?? null;
-
-        if (!$categoryName) {
+        if (empty($categoryName)) {
             return response()->json([
-                'fulfillmentText' => 'Please specify a category name.'
+                'fulfillmentText' => 'Which category would you like to check?'
             ]);
         }
 
-        $category = Category::where('name', 'like', "%{$categoryName}%")->first();
+        // Case-insensitive exact match for category
+        $category = Category::whereRaw('LOWER(name) = LOWER(?)', [trim($categoryName)])
+            ->select('id', 'name')
+            ->first();
 
         if (!$category) {
             return response()->json([
-                'fulfillmentText' => "Sorry, I couldn't find a category named '{$categoryName}'."
+                'fulfillmentText' => "I couldn't find the '$categoryName' category."
             ]);
         }
 
-        $productCount = $category->products()->count();
+        $productCount = Product::where('category_id', $category->id)
+            ->count();
 
         return response()->json([
-            'fulfillmentText' => "There are {$productCount} products in the {$category->name} category."
+            'fulfillmentText' => "There are $productCount products in the {$category->name} category."
         ]);
     }
 }
