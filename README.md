@@ -1,66 +1,148 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Genuine API - Product Inventory with Dialogflow Integration
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based API that manages product inventory and integrates with Dialogflow for natural language processing of product availability queries.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- RESTful API for managing products and categories
+- Dialogflow webhook integration for natural language product queries
+- Product availability checking by category or specific product
+- Database-driven inventory management
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Prerequisites
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.1 or higher
+- Composer
+- MySQL/MariaDB
+- Dialogflow account and project setup
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/genuine-api.git
+   cd genuine-api
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. Install dependencies:
+   ```bash
+   composer install
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. Set up environment:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Laravel Sponsors
+4. Configure database in `.env`:
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=your_database
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. Run migrations and seeders:
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   ```
 
-### Premium Partners
+## Development Setup
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Running the Application
 
-## Contributing
+1. Start the Laravel development server:
+   ```bash
+   php artisan serve
+   ```
+   The API will be available at `http://localhost:8000`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Setting up Ngrok for Dialogflow Webhook
 
-## Code of Conduct
+1. Install Ngrok:
+   - Download from [https://ngrok.com/download](https://ngrok.com/download)
+   - Extract the executable to a convenient location
+   - Sign up for a free account and get your auth token
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. Authenticate Ngrok:
+   ```bash
+   ngrok config add-authtoken YOUR_AUTH_TOKEN
+   ```
 
-## Security Vulnerabilities
+3. Start Ngrok tunnel (in a new terminal):
+   ```bash
+   ngrok http 8000
+   ```
+   This will create a public URL (e.g., `https://your-tunnel-id.ngrok.io`)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. Configure Dialogflow Webhook:
+   - Go to your Dialogflow agent's settings
+   - Navigate to the "Fulfillment" tab
+   - Enable the webhook
+   - Set the URL to: `https://your-tunnel-id.ngrok.io/api/dialogflow/webhook`
+   - Click "Save"
+
+5. Test the Integration:
+   - Use the Dialogflow simulator or test your queries
+   - Check the Ngrok web interface (http://localhost:4040) to monitor requests
+   - Verify webhook responses in the Laravel logs (`storage/logs/laravel.log`)
+
+## API Endpoints
+
+### Dialogflow Integration
+
+- `GET /api/dialogflow/status` - Check Dialogflow integration status
+- `POST /api/dialogflow/webhook` - Webhook endpoint for Dialogflow requests
+
+### Data Endpoints
+
+- `GET /data` - Retrieve all categories with their products
+
+## Dialogflow Setup
+
+### Intents
+
+1. **Default Welcome Intent**
+   - Handles initial greetings
+   - Response: "Hello! How can I assist you today?"
+
+2. **Product Availability Intent**
+   - Name: `product.availability`
+   - Training phrases examples:
+     - "How many products are in [category]?"
+     - "Do you have [product] in stock?"
+     - "What's the quantity of [product] in [category]?"
+
+### Entities
+
+1. **Category**
+   - Type: List
+   - Used to identify product categories in queries
+
+2. **Product**
+   - Type: List
+   - Used to identify specific products in queries
+
+## Example Queries
+
+- "How many products are in the Electronics category?"
+- "Do you have iPhone in stock?"
+- "What's the quantity of Samsung TV in Electronics?"
+
+## Response Format
+
+The API returns JSON responses in the following format:
+
+```json
+{
+    "fulfillmentText": "There are 5 products in the Electronics category."
+}
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
