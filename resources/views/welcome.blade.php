@@ -64,18 +64,15 @@
   <body class="bg-gray-100 min-h-screen flex flex-col">
     <!-- Top Navigation (optional) -->
     <nav class="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
-      <div class="text-xl font-semibold text-gray-800">Genuine Chat Messenger</div>
-      <div class="space-x-4">
-        <a href="#" class="text-gray-600 hover:text-gray-900 transition">Home</a>
-        <a href="#" class="text-gray-600 hover:text-gray-900 transition">Features</a>
-        <a href="#" class="text-gray-600 hover:text-gray-900 transition">Contact</a>
-      </div>
+      <div class="text-xl font-semibold text-gray-800">Genuine Dialogflow API</div>
+  
     </nav>
 
     <!-- Main Content Area: Sidebar + Chat -->
     <div class="flex flex-1 overflow-hidden fade-in">
       <!-- Sidebar: Project Info -->
-      <aside class="w-72 bg-white border-r border-gray-200 p-6 overflow-y-auto">
+      <!-- Increased width from w-72 to w-1/2 -->
+      <aside class="w-1/2 bg-white border-r border-gray-200 p-6 overflow-y-auto">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">
           About This Project
         </h2>
@@ -83,8 +80,7 @@
           This Laravel-powered web application integrates with Dialogflow to create
           a dynamic chat messenger interface. The chatbot is connected to a Dialogflow
           agent (agent-id) to handle user conversations. The application also includes
-          models for Categories and Products, suggesting it can serve as an
-          e-commerce or product-focused chatbot system.
+          models for Categories and Products.
         </p>
         <hr class="my-4" />
         <h3 class="text-lg font-medium text-gray-800 mb-2">
@@ -95,14 +91,14 @@
           <li>Dialogflow Integration</li>
           <li>Chat Messenger Interface</li>
           <li>Categories & Products Models</li>
-          <li>Potential E-commerce Support</li>
+      
         </ul>
       </aside>
 
       <!-- Chat Section -->
+      <!-- Justify content to the end and limit the max width to make the chat smaller -->
       <main class="flex-1 p-6 overflow-y-auto flex items-center justify-end">
-        <!-- The chat container is set to fill the available right side space -->
-        <div class="w-full max-w-3xl">
+        <div class="w-full max-w-lg">
           <df-messenger
             chat-title="Genuine"
             agent-id="5c75b03f-6de0-4485-8068-cba65d8c0979"
